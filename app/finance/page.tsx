@@ -97,7 +97,6 @@ export default async function FinancePage() {
                             {q.symbol}
                           </td>
                           <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
-                            {q.currency && q.currency !== "USD" ? `${q.currency} ` : ""}
                             {fmt(q.price)}
                           </td>
                           <td
