@@ -1,7 +1,7 @@
 import { getMarketQuotes, getTasks, getVentures, getDailyBrief } from "@/lib/queries";
 import { getUpcomingEvents, getImportantThreads } from "@/lib/google";
 import { fmt, fmtPct, changeColor, formatEventTime } from "@/lib/utils";
-import { CalendarDays, CheckSquare, Rocket, TrendingUp, Mail } from "lucide-react";
+import { CalendarDays, CheckSquare, Rocket, TrendingUp, Mail, AlertCircle } from "lucide-react";
 
 export const revalidate = 300; // revalidate every 5 minutes
 
@@ -27,6 +27,19 @@ export default async function HomePage() {
     ["S&P 500", "NASDAQ", "FTSE 100", "Bitcoin", "EUR/USD", "GBP/USD"].includes(q.label)
   );
 
+  // KPI strip data
+  const sp500 = mq.find((q) => q.label === "S&P 500");
+  const allTasks = tasks.status === "fulfilled" ? tasks.value : [];
+  const todayStr = new Date().toISOString().split("T")[0];
+  const tasksDueToday = allTasks.filter((t) => t.due_date === todayStr).length;
+  const nextEvent = calEvents.length > 0 ? calEvents[0] : null;
+  const staleVentures = ventures.status === "fulfilled"
+    ? ventures.value.filter((v) => {
+        const days = (Date.now() - new Date(v.last_update).getTime()) / (1000 * 60 * 60 * 24);
+        return days > 30 && v.stage !== "paused";
+      }).length
+    : 0;
+
   const today = new Date().toLocaleDateString("en-GB", {
     weekday: "long",
     year: "numeric",
@@ -40,6 +53,53 @@ export default async function HomePage() {
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Good morning, Cabral</h1>
         <p className="text-muted-foreground text-sm mt-0.5">{today}</p>
+      </div>
+
+      {/* KPI strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* S&P 500 */}
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+          <p className="text-xs text-muted-foreground">S&P 500</p>
+          <p className="text-xl font-semibold font-mono tabular-nums text-foreground">
+            {sp500 ? fmt(sp500.price, 0) : "—"}
+          </p>
+          <p className={`text-xs font-mono tabular-nums ${changeColor(sp500?.change_pct ?? null)}`}>
+            {sp500 ? fmtPct(sp500.change_pct) : "—"} today
+          </p>
+        </div>
+
+        {/* Tasks due today */}
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+          <p className="text-xs text-muted-foreground">Tasks due today</p>
+          <p className="text-xl font-semibold font-mono tabular-nums text-foreground">
+            {tasksDueToday}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {tasksDueToday === 0 ? "All clear" : tasksDueToday === 1 ? "1 task" : `${tasksDueToday} tasks`}
+          </p>
+        </div>
+
+        {/* Next event */}
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+          <p className="text-xs text-muted-foreground">Next event</p>
+          <p className="text-sm font-medium text-foreground leading-tight truncate">
+            {nextEvent ? nextEvent.summary : "Nothing scheduled"}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {nextEvent ? formatEventTime(nextEvent.start) : "—"}
+          </p>
+        </div>
+
+        {/* Ventures needing attention */}
+        <div className={`rounded-lg border bg-card px-4 py-3 space-y-1 ${staleVentures > 0 ? "border-amber-900/60" : "border-border"}`}>
+          <p className="text-xs text-muted-foreground">Ventures stale</p>
+          <p className={`text-xl font-semibold font-mono tabular-nums ${staleVentures > 0 ? "text-amber-400" : "text-foreground"}`}>
+            {staleVentures}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {staleVentures === 0 ? "All up to date" : `${staleVentures} need update`}
+          </p>
+        </div>
       </div>
 
       {/* Daily brief */}
