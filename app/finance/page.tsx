@@ -10,7 +10,14 @@ import { Sparkline } from "@/components/sparkline";
 
 export const revalidate = 300;
 
-const CATEGORIES = ["Index", "FX", "Rates", "Commodities", "Crypto"] as const;
+// `key` matches the value stored in the DB (singular); `label` is for display.
+const CATEGORIES = [
+  { key: "index", label: "Index" },
+  { key: "fx", label: "FX" },
+  { key: "rate", label: "Rates" },
+  { key: "commodity", label: "Commodities" },
+  { key: "crypto", label: "Crypto" },
+] as const;
 
 export default async function FinancePage() {
   const quotes = await getMarketQuotes();
@@ -21,8 +28,8 @@ export default async function FinancePage() {
 
   const byCategory = CATEGORIES.reduce<Record<string, typeof quotes>>(
     (acc, cat) => {
-      acc[cat] = quotes.filter(
-        (q) => q.category?.toLowerCase() === cat.toLowerCase()
+      acc[cat.key] = quotes.filter(
+        (q) => q.category?.toLowerCase() === cat.key
       );
       return acc;
     },
@@ -70,12 +77,12 @@ export default async function FinancePage() {
       ) : (
         <div className="space-y-6">
           {CATEGORIES.map((cat) => {
-            const rows = byCategory[cat];
+            const rows = byCategory[cat.key];
             if (!rows || rows.length === 0) return null;
             return (
-              <div key={cat}>
+              <div key={cat.key}>
                 <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
-                  {cat}
+                  {cat.label}
                 </h2>
                 <div className="rounded-lg border border-border bg-card overflow-hidden card-hover">
                   <table className="w-full text-sm">
