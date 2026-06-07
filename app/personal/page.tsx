@@ -64,7 +64,7 @@ export default async function PersonalPage() {
           {COLUMNS.map(({ status, label }, i) => {
             const tasks = tasksByStatus[i] ?? [];
             return (
-              <div key={status} className="rounded-lg border border-border bg-card p-3 space-y-2">
+              <div key={status} className="rounded-lg border border-border bg-card p-3 space-y-2 card-hover">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {label}

@@ -71,7 +71,7 @@ export default async function VenturesPage() {
                   items.map((v) => (
                     <div
                       key={v.id}
-                      className={`rounded-lg border bg-card p-3 space-y-1.5 ${
+                      className={`rounded-lg border bg-card p-3 space-y-1.5 card-hover ${
                         isStale(v) ? "border-amber-900/50" : "border-border"
                       }`}
                     >

@@ -27,6 +27,13 @@
   }
 }
 
+@layer components {
+  /* Subtle interactive lift for cards */
+  .card-hover {
+    @apply transition-all duration-200 hover:border-muted-foreground/25 hover:shadow-lg hover:shadow-black/30;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -28,6 +28,47 @@ export async function getMarketQuotes(): Promise<MarketQuote[]> {
   return data ?? [];
 }
 
+// Daily close history per symbol, for sparklines. Returns a map of
+// symbol -> chronological close values (oldest first).
+export async function getQuoteHistory(
+  daysBack = 30
+): Promise<Record<string, number[]>> {
+  const since = new Date();
+  since.setDate(since.getDate() - daysBack);
+  const { data, error } = await supabaseAdmin
+    .from("market_quote_history")
+    .select("symbol, as_of, close")
+    .gte("as_of", since.toISOString().split("T")[0])
+    .order("as_of");
+
+  if (error) {
+    console.error("getQuoteHistory error:", error);
+    return {};
+  }
+  const map: Record<string, number[]> = {};
+  for (const row of data ?? []) {
+    (map[row.symbol] ??= []).push(Number(row.close));
+  }
+  return map;
+}
+
+// Append today's close for each quote so the sparkline history grows over
+// time. Idempotent: keyed on (symbol, as_of), so repeated calls per day are
+// safe regardless of how often the page revalidates.
+export async function recordQuoteSnapshot(quotes: MarketQuote[]): Promise<void> {
+  if (!quotes.length) return;
+  const today = new Date().toISOString().split("T")[0];
+  const rows = quotes.map((q) => ({
+    symbol: q.symbol,
+    as_of: today,
+    close: q.price,
+  }));
+  const { error } = await supabaseAdmin
+    .from("market_quote_history")
+    .upsert(rows, { onConflict: "symbol,as_of" });
+  if (error) console.error("recordQuoteSnapshot error:", error);
+}
+
 // ── Tasks ─────────────────────────────────────────────────────
 export type Task = {
   id: string;

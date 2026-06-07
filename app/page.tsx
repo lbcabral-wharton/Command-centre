@@ -22,9 +22,12 @@ export default async function HomePage() {
   const calEvents = events.status === "fulfilled" ? events.value.slice(0, 5) : [];
   const threads = mail.status === "fulfilled" ? mail.value.slice(0, 4) : [];
 
-  // Key market indices for the landing snapshot
-  const keyIndices = mq.filter((q) =>
-    ["S&P 500", "NASDAQ", "FTSE 100", "Bitcoin", "EUR/USD", "GBP/USD"].includes(q.label)
+  // Key market instruments for the landing snapshot.
+  // Filter by stable symbols (labels drift, e.g. "NASDAQ Composite"), and
+  // preserve this curated order regardless of DB sort.
+  const KEY_SYMBOLS = ["^GSPC", "^IXIC", "EURUSD=X", "GBPUSD=X", "GC=F", "BZ=F"];
+  const keyIndices = KEY_SYMBOLS.map((sym) => mq.find((q) => q.symbol === sym)).filter(
+    (q): q is (typeof mq)[number] => q != null
   );
 
   // KPI strip data
@@ -32,7 +35,15 @@ export default async function HomePage() {
   const allTasks = tasks.status === "fulfilled" ? tasks.value : [];
   const todayStr = new Date().toISOString().split("T")[0];
   const tasksDueToday = allTasks.filter((t) => t.due_date === todayStr).length;
-  const nextEvent = calEvents.length > 0 ? calEvents[0] : null;
+  // Next event: only events that haven't started yet. getUpcomingEvents filters
+  // by end time, so in-progress events (with a past start) can slip through.
+  const now = Date.now();
+  const upcomingEvents = calEvents.filter((e) => {
+    if (!e.start) return false;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(e.start)) return e.start >= todayStr; // all-day
+    return new Date(e.start).getTime() >= now;
+  });
+  const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null;
   const staleVentures = ventures.status === "fulfilled"
     ? ventures.value.filter((v) => {
         const days = (Date.now() - new Date(v.last_update).getTime()) / (1000 * 60 * 60 * 24);
@@ -58,7 +69,7 @@ export default async function HomePage() {
       {/* KPI strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* S&P 500 */}
-        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1 card-hover">
           <p className="text-xs text-muted-foreground">S&P 500</p>
           <p className="text-xl font-semibold font-mono tabular-nums text-foreground">
             {sp500 ? fmt(sp500.price, 0) : "—"}
@@ -69,7 +80,7 @@ export default async function HomePage() {
         </div>
 
         {/* Tasks due today */}
-        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1 card-hover">
           <p className="text-xs text-muted-foreground">Tasks due today</p>
           <p className="text-xl font-semibold font-mono tabular-nums text-foreground">
             {tasksDueToday}
@@ -80,7 +91,7 @@ export default async function HomePage() {
         </div>
 
         {/* Next event */}
-        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
+        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1 card-hover">
           <p className="text-xs text-muted-foreground">Next event</p>
           <p className="text-sm font-medium text-foreground leading-tight truncate">
             {nextEvent ? nextEvent.summary : "Nothing scheduled"}
@@ -91,7 +102,7 @@ export default async function HomePage() {
         </div>
 
         {/* Ventures needing attention */}
-        <div className={`rounded-lg border bg-card px-4 py-3 space-y-1 ${staleVentures > 0 ? "border-amber-900/60" : "border-border"}`}>
+        <div className={`rounded-lg border bg-card px-4 py-3 space-y-1 card-hover ${staleVentures > 0 ? "border-amber-900/60" : "border-border"}`}>
           <p className="text-xs text-muted-foreground">Ventures stale</p>
           <p className={`text-xl font-semibold font-mono tabular-nums ${staleVentures > 0 ? "text-amber-400" : "text-foreground"}`}>
             {staleVentures}
@@ -112,7 +123,7 @@ export default async function HomePage() {
       {/* Market snapshot + Calendar row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Markets */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-medium text-foreground">Markets</h2>
@@ -145,7 +156,7 @@ export default async function HomePage() {
         </div>
 
         {/* Calendar */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-medium text-foreground">Next 3 days</h2>
@@ -173,7 +184,7 @@ export default async function HomePage() {
       {/* Tasks + Mail row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Tasks */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
           <div className="flex items-center gap-2">
             <CheckSquare className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-medium text-foreground">Inbox</h2>
@@ -214,7 +225,7 @@ export default async function HomePage() {
         </div>
 
         {/* Mail */}
-        <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+        <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
           <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-muted-foreground" />
             <h2 className="text-sm font-medium text-foreground">Important mail</h2>
@@ -237,7 +248,7 @@ export default async function HomePage() {
       </div>
 
       {/* Ventures snapshot */}
-      <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+      <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
         <div className="flex items-center gap-2">
           <Rocket className="w-4 h-4 text-muted-foreground" />
           <h2 className="text-sm font-medium text-foreground">Ventures</h2>
@@ -247,7 +258,7 @@ export default async function HomePage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {activeVentures.map((v) => (
-              <div key={v.id} className="rounded-md border border-border p-3 space-y-1">
+              <div key={v.id} className="rounded-md border border-border p-3 space-y-1 card-hover">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground">{v.name}</span>
                   <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded capitalize">

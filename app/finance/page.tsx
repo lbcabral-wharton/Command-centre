@@ -1,7 +1,12 @@
-import { getMarketQuotes } from "@/lib/queries";
+import {
+  getMarketQuotes,
+  getQuoteHistory,
+  recordQuoteSnapshot,
+} from "@/lib/queries";
 import { fmt, fmtPct, changeColor } from "@/lib/utils";
 import { RefreshCw } from "lucide-react";
 import { refreshMarkets } from "@/app/actions/markets";
+import { Sparkline } from "@/components/sparkline";
 
 export const revalidate = 300;
 
@@ -9,6 +14,10 @@ const CATEGORIES = ["Index", "FX", "Rates", "Commodities", "Crypto"] as const;
 
 export default async function FinancePage() {
   const quotes = await getMarketQuotes();
+
+  // Capture today's snapshot so the trend history grows, then load it.
+  await recordQuoteSnapshot(quotes);
+  const history = await getQuoteHistory(30);
 
   const byCategory = CATEGORIES.reduce<Record<string, typeof quotes>>(
     (acc, cat) => {
@@ -68,7 +77,7 @@ export default async function FinancePage() {
                 <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   {cat}
                 </h2>
-                <div className="rounded-lg border border-border bg-card overflow-hidden">
+                <div className="rounded-lg border border-border bg-card overflow-hidden card-hover">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border">
@@ -77,6 +86,9 @@ export default async function FinancePage() {
                         </th>
                         <th className="text-left text-xs text-muted-foreground font-medium px-4 py-2.5 hidden sm:table-cell">
                           Symbol
+                        </th>
+                        <th className="text-center text-xs text-muted-foreground font-medium px-4 py-2.5 hidden md:table-cell">
+                          30d
                         </th>
                         <th className="text-right text-xs text-muted-foreground font-medium px-4 py-2.5">
                           Price
@@ -95,6 +107,14 @@ export default async function FinancePage() {
                           <td className="px-4 py-2.5 text-foreground">{q.label}</td>
                           <td className="px-4 py-2.5 text-muted-foreground hidden sm:table-cell">
                             {q.symbol}
+                          </td>
+                          <td className="px-4 py-2.5 hidden md:table-cell">
+                            <div className="flex justify-center">
+                              <Sparkline
+                                data={history[q.symbol] ?? []}
+                                positive={(q.change_pct ?? 0) >= 0}
+                              />
+                            </div>
                           </td>
                           <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
                             {fmt(q.price)}
