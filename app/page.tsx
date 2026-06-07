@@ -24,7 +24,7 @@ export default async function HomePage() {
 
   // Key market indices for the landing snapshot
   const keyIndices = mq.filter((q) =>
-    ["S&P 500", "NASDAQ", "FTSE 100", "Bitcoin", "EUR/USD", "GBP/USD"].includes(q.name)
+    ["S&P 500", "NASDAQ", "FTSE 100", "Bitcoin", "EUR/USD", "GBP/USD"].includes(q.label)
   );
 
   const today = new Date().toLocaleDateString("en-GB", {
@@ -64,7 +64,7 @@ export default async function HomePage() {
               {keyIndices.map((q) => (
                 <div key={q.symbol} className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm text-foreground">{q.name}</span>
+                    <span className="text-sm text-foreground">{q.label}</span>
                     <span className="ml-1.5 text-xs text-muted-foreground">{q.symbol}</span>
                   </div>
                   <div className="text-right">

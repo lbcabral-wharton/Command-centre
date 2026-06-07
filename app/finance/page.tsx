@@ -21,7 +21,7 @@ export default async function FinancePage() {
   );
 
   const lastUpdated =
-    quotes.length > 0
+    quotes.length > 0 && quotes[0].updated_at
       ? new Date(quotes[0].updated_at).toLocaleString("en-GB", {
           day: "2-digit",
           month: "short",
@@ -92,7 +92,7 @@ export default async function FinancePage() {
                           key={q.symbol}
                           className={i < rows.length - 1 ? "border-b border-border/50" : ""}
                         >
-                          <td className="px-4 py-2.5 text-foreground">{q.name}</td>
+                          <td className="px-4 py-2.5 text-foreground">{q.label}</td>
                           <td className="px-4 py-2.5 text-muted-foreground hidden sm:table-cell">
                             {q.symbol}
                           </td>

@@ -40,6 +40,10 @@ const config: Config = {
           foreground: "hsl(var(--destructive-foreground))",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-geist)", "system-ui", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

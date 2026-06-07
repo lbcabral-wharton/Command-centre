@@ -3,12 +3,13 @@ import { supabaseAdmin, OWNER } from "./supabase";
 // ── Market quotes ─────────────────────────────────────────────
 export type MarketQuote = {
   symbol: string;
-  name: string;
+  label: string;
   category: string;
+  sort_order: number | null;
   price: number;
   prev_close: number | null;
   change_pct: number | null;
-  currency: string;
+  as_of: string | null;
   updated_at: string;
 };
 
@@ -17,7 +18,8 @@ export async function getMarketQuotes(): Promise<MarketQuote[]> {
     .from("market_quotes")
     .select("*")
     .order("category")
-    .order("name");
+    .order("sort_order")
+    .order("label");
 
   if (error) {
     console.error("getMarketQuotes error:", error);

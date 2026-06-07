@@ -4,7 +4,9 @@
 
 @layer base {
   :root {
-    --background: 0 0% 5%;
+    --font-geist: "Geist", system-ui, sans-serif;
+    --font-geist-mono: "Geist Mono", "Fira Code", monospace;
+    --background: 0 0% 4%;
     --foreground: 0 0% 95%;
     --card: 0 0% 8%;
     --card-foreground: 0 0% 95%;
@@ -31,7 +33,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-geist);
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Geist Mono for all numeric/tabular data */
+  .font-mono, [class*="tabular-nums"] {
+    font-family: var(--font-geist-mono);
   }
 }
 
