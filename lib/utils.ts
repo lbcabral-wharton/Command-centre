@@ -21,8 +21,8 @@ export function fmtPct(n: number | null | undefined): string {
 
 export function changeColor(n: number | null | undefined): string {
   if (n == null) return "text-muted-foreground";
-  if (n > 0) return "text-emerald-400";
-  if (n < 0) return "text-red-400";
+  if (n > 0) return "text-emerald-600";
+  if (n < 0) return "text-red-600";
   return "text-muted-foreground";
 }
 

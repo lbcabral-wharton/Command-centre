@@ -50,7 +50,7 @@ export default async function FinancePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Finance</h1>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Finance</h1>
           {lastUpdated && (
             <p className="text-xs text-muted-foreground mt-0.5">
               Last refreshed {lastUpdated}

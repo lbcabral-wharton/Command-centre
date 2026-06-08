@@ -13,8 +13,8 @@ const COLUMNS = [
 ];
 
 const PRIORITY_DOT: Record<string, string> = {
-  high: "bg-red-400",
-  medium: "bg-amber-400",
+  high: "bg-red-500",
+  medium: "bg-amber-500",
   low: "bg-muted-foreground",
 };
 
@@ -53,7 +53,7 @@ export default async function PersonalPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-foreground">Personal</h1>
+      <h1 className="font-display text-3xl font-semibold text-foreground">Personal</h1>
 
       {/* Task board */}
       <div>

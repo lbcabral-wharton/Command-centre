@@ -5,7 +5,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-8">
         <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground">
             Command Centre
           </h1>
           <p className="mt-2 text-muted-foreground text-sm">

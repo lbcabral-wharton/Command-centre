@@ -62,7 +62,7 @@ export default async function HomePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Good morning, Cabral</h1>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Good morning, Cabral</h1>
         <p className="text-muted-foreground text-sm mt-0.5">{today}</p>
       </div>
 
@@ -102,9 +102,9 @@ export default async function HomePage() {
         </div>
 
         {/* Ventures needing attention */}
-        <div className={`rounded-lg border bg-card px-4 py-3 space-y-1 card-hover ${staleVentures > 0 ? "border-amber-900/60" : "border-border"}`}>
+        <div className={`rounded-lg border bg-card px-4 py-3 space-y-1 card-hover ${staleVentures > 0 ? "border-amber-300" : "border-border"}`}>
           <p className="text-xs text-muted-foreground">Ventures stale</p>
-          <p className={`text-xl font-semibold font-mono tabular-nums ${staleVentures > 0 ? "text-amber-400" : "text-foreground"}`}>
+          <p className={`text-xl font-semibold font-mono tabular-nums ${staleVentures > 0 ? "text-amber-600" : "text-foreground"}`}>
             {staleVentures}
           </p>
           <p className="text-xs text-muted-foreground">
@@ -203,9 +203,9 @@ export default async function HomePage() {
                   <div
                     className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${
                       t.priority === "high"
-                        ? "bg-red-400"
+                        ? "bg-red-500"
                         : t.priority === "medium"
-                        ? "bg-amber-400"
+                        ? "bg-amber-500"
                         : "bg-muted-foreground"
                     }`}
                   />

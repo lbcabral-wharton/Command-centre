@@ -6,31 +6,40 @@
   :root {
     --font-sans: "Inter", system-ui, sans-serif;
     --font-mono: "JetBrains Mono", monospace;
-    --background: 0 0% 4%;
-    --foreground: 0 0% 95%;
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 95%;
-    --primary: 217 91% 60%;
+    --font-display: "Playfair Display", Georgia, serif;
+
+    /* Light pastel theme */
+    --background: 252 44% 97%;
+    --foreground: 240 18% 22%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 18% 22%;
+    --primary: 252 70% 64%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 90%;
-    --destructive: 0 84% 60%;
+    --secondary: 252 30% 95%;
+    --secondary-foreground: 240 18% 28%;
+    --muted: 250 30% 96%;
+    --muted-foreground: 240 8% 48%;
+    --accent: 252 48% 95%;
+    --accent-foreground: 240 18% 28%;
+    --destructive: 0 72% 56%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 14%;
-    --input: 0 0% 14%;
-    --ring: 217 91% 60%;
-    --radius: 0.5rem;
+    --border: 250 24% 91%;
+    --input: 250 24% 91%;
+    --ring: 252 70% 64%;
+    --radius: 1rem;
+
+    /* Pastel category accents (HSL channels) */
+    --cat-cream: 44 38% 87%;
+    --cat-sage: 140 24% 86%;
+    --cat-stone: 270 12% 88%;
+    --cat-blue: 220 34% 86%;
   }
 }
 
 @layer components {
   /* Subtle interactive lift for cards */
   .card-hover {
-    @apply transition-all duration-200 hover:border-muted-foreground/25 hover:shadow-lg hover:shadow-black/30;
+    @apply transition-all duration-200 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5;
   }
 }
 
@@ -39,19 +48,27 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
+    background: linear-gradient(160deg, hsl(252 46% 97%) 0%, hsl(28 44% 96%) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 
-  /* Geist Mono for all numeric/tabular data */
+  /* Serif display font for the logo + headings */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* JetBrains Mono for all numeric/tabular data */
   .font-mono, [class*="tabular-nums"] {
     font-family: var(--font-mono);
   }
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }

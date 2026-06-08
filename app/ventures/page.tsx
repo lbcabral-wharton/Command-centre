@@ -11,16 +11,16 @@ const STAGES = [
 ] as const;
 
 const STAGE_COLORS: Record<string, string> = {
-  idea: "text-blue-400 bg-blue-400/10",
-  validating: "text-purple-400 bg-purple-400/10",
-  building: "text-amber-400 bg-amber-400/10",
-  active: "text-emerald-400 bg-emerald-400/10",
+  idea: "text-blue-700 bg-blue-100",
+  validating: "text-purple-700 bg-purple-100",
+  building: "text-amber-700 bg-amber-100",
+  active: "text-emerald-700 bg-emerald-100",
   paused: "text-muted-foreground bg-muted",
 };
 
 const PRIORITY_COLORS: Record<string, string> = {
-  high: "text-red-400",
-  medium: "text-amber-400",
+  high: "text-red-600",
+  medium: "text-amber-600",
   low: "text-muted-foreground",
 };
 
@@ -41,7 +41,7 @@ export default async function VenturesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-foreground">Ventures</h1>
+        <h1 className="font-display text-3xl font-semibold text-foreground">Ventures</h1>
         <span className="text-xs text-muted-foreground">{ventures.length} total</span>
       </div>
 
@@ -72,7 +72,7 @@ export default async function VenturesPage() {
                     <div
                       key={v.id}
                       className={`rounded-lg border bg-card p-3 space-y-1.5 card-hover ${
-                        isStale(v) ? "border-amber-900/50" : "border-border"
+                        isStale(v) ? "border-amber-300" : "border-border"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-1">
@@ -80,7 +80,7 @@ export default async function VenturesPage() {
                           {v.name}
                         </p>
                         {isStale(v) && (
-                          <span className="text-xs text-amber-500 flex-shrink-0">stale</span>
+                          <span className="text-xs text-amber-600 flex-shrink-0">stale</span>
                         )}
                       </div>
                       {v.thesis && (

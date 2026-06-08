@@ -29,7 +29,7 @@ export function Sparkline({
   }
 
   const chartData = data.map((v, i) => ({ i, v }));
-  const color = positive ? "#34d399" : "#f87171"; // emerald-400 / red-400
+  const color = positive ? "#059669" : "#dc2626"; // emerald-600 / red-600
 
   return (
     <LineChart

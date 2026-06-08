@@ -1,11 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { Nav } from "@/components/nav";
+import { Sidebar } from "@/components/nav";
 import { auth } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"] });
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500"],
+});
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Command Centre",
@@ -13,13 +22,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Command Centre",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0d0d0d",
+  themeColor: "#f3f1fb",
   width: "device-width",
   initialScale: 1,
 };
@@ -30,16 +39,24 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const isAuthRoute =
-    typeof window === "undefined" &&
-    // Server-side check handled by middleware; layout just wraps
-    false;
 
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} ${mono.variable} font-sans`}>
-        {session && <Nav />}
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">{children}</main>
+    <html lang="en">
+      <body
+        className={`${inter.variable} ${mono.variable} ${playfair.variable} font-sans`}
+      >
+        {session ? (
+          <>
+            <Sidebar user={session.user ?? null} />
+            <main className="md:pl-64">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {children}
+              </div>
+            </main>
+          </>
+        ) : (
+          <main>{children}</main>
+        )}
       </body>
     </html>
   );
