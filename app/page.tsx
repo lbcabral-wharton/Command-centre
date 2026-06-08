@@ -1,7 +1,17 @@
 import { getMarketQuotes, getTasks, getVentures, getDailyBrief } from "@/lib/queries";
 import { getUpcomingEvents, getImportantThreads } from "@/lib/google";
 import { fmt, fmtPct, changeColor, formatEventTime } from "@/lib/utils";
-import { CalendarDays, CheckSquare, Rocket, TrendingUp, Mail, AlertCircle } from "lucide-react";
+import {
+  CalendarDays,
+  CheckSquare,
+  Rocket,
+  TrendingUp,
+  Mail,
+  Sparkles,
+  ArrowUpRight,
+  PieChart as PieIcon,
+} from "lucide-react";
+import { OverviewDonut } from "@/components/overview-donut";
 
 export const revalidate = 300; // revalidate every 5 minutes
 
@@ -58,12 +68,90 @@ export default async function HomePage() {
     day: "numeric",
   });
 
+  const allVentures = ventures.status === "fulfilled" ? ventures.value : [];
+
+  // Status banner text: use the stored daily brief, else build a quick summary.
+  const briefText =
+    dailyBrief?.summary ??
+    `You have ${
+      tasksDueToday === 0 ? "nothing" : `${tasksDueToday} task${tasksDueToday === 1 ? "" : "s"}`
+    } due today${
+      nextEvent ? `, and "${nextEvent.summary}" is next on your calendar` : ""
+    }. ${
+      staleVentures > 0
+        ? `${staleVentures} venture${staleVentures === 1 ? "" : "s"} need a nudge.`
+        : "Ventures are all up to date."
+    }`;
+
+  // Category cards (link to each section with a live count).
+  const categories = [
+    {
+      href: "/personal",
+      title: "Personal",
+      desc: "Tasks, habits & your week.",
+      count: `${allTasks.length} in inbox`,
+      icon: CheckSquare,
+      bg: "var(--cat-sage)",
+    },
+    {
+      href: "/finance",
+      title: "Finance",
+      desc: "Markets watchlist & trends.",
+      count: `${mq.length} instruments`,
+      icon: TrendingUp,
+      bg: "var(--cat-blue)",
+    },
+    {
+      href: "/ventures",
+      title: "Ventures",
+      desc: "Pipeline & next actions.",
+      count: `${allVentures.length} ventures`,
+      icon: Rocket,
+      bg: "var(--cat-cream)",
+    },
+    {
+      href: "/personal",
+      title: "Calendar",
+      desc: "What's coming up next.",
+      count: `${calEvents.length} upcoming`,
+      icon: CalendarDays,
+      bg: "var(--cat-stone)",
+    },
+  ];
+
+  // Ventures-by-stage donut.
+  const STAGE_META = [
+    { key: "idea", label: "Idea", color: "#3b82f6" },
+    { key: "validating", label: "Validating", color: "#8b5cf6" },
+    { key: "building", label: "Building", color: "#f59e0b" },
+    { key: "active", label: "Active", color: "#10b981" },
+    { key: "paused", label: "Paused", color: "#9ca3af" },
+  ];
+  const stageBreakdown = STAGE_META.map((s) => ({
+    label: s.label,
+    value: allVentures.filter((v) => v.stage === s.key).length,
+    color: s.color,
+  })).filter((s) => s.value > 0);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="font-display text-3xl font-semibold text-foreground">Good morning, Cabral</h1>
         <p className="text-muted-foreground text-sm mt-0.5">{today}</p>
+      </div>
+
+      {/* Status banner */}
+      <div className="rounded-2xl border border-border bg-gradient-to-r from-[hsl(252_60%_95%)] to-[hsl(28_60%_94%)] p-5 flex items-start gap-4">
+        <div className="rounded-xl bg-card/70 p-2.5 flex-shrink-0">
+          <Sparkles className="w-5 h-5 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-medium uppercase tracking-wider text-primary mb-1">
+            Today&apos;s brief
+          </p>
+          <p className="text-sm text-foreground/80 leading-relaxed">{briefText}</p>
+        </div>
       </div>
 
       {/* KPI strip */}
@@ -113,12 +201,37 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Daily brief */}
-      {dailyBrief?.summary && (
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">{dailyBrief.summary}</p>
-        </div>
-      )}
+      {/* Category cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {categories.map((c) => {
+          const Icon = c.icon;
+          return (
+            <a
+              key={c.title}
+              href={c.href}
+              className="group relative overflow-hidden rounded-2xl p-5 min-h-[148px] flex flex-col card-hover"
+              style={{ backgroundColor: `hsl(${c.bg})` }}
+            >
+              <Icon
+                className="absolute -right-4 -bottom-4 w-24 h-24 text-foreground/[0.06]"
+                strokeWidth={1}
+              />
+              <div className="flex items-start justify-between relative">
+                <h3 className="font-display text-lg font-semibold text-foreground">
+                  {c.title}
+                </h3>
+                <ArrowUpRight className="w-4 h-4 text-foreground/40 group-hover:text-foreground transition-colors" />
+              </div>
+              <p className="text-xs text-foreground/60 mt-1 max-w-[85%] relative">
+                {c.desc}
+              </p>
+              <span className="mt-auto inline-flex w-fit items-center rounded-full bg-card/70 px-2.5 py-1 text-xs font-medium text-foreground/80 relative">
+                {c.count}
+              </span>
+            </a>
+          );
+        })}
+      </div>
 
       {/* Market snapshot + Calendar row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -245,6 +358,61 @@ export default async function HomePage() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Overview donut */}
+      <div className="rounded-lg border border-border bg-card p-4 space-y-3 card-hover">
+        <div className="flex items-center gap-2">
+          <PieIcon className="w-4 h-4 text-muted-foreground" />
+          <h2 className="text-sm font-medium text-foreground">Ventures overview</h2>
+        </div>
+        {allVentures.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No ventures yet.</p>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <OverviewDonut
+              data={stageBreakdown}
+              total={allVentures.length}
+              centerLabel="ventures"
+              size={180}
+            />
+            <div className="flex-1 w-full">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-xs text-muted-foreground">
+                    <th className="text-left font-medium py-1.5">Stage</th>
+                    <th className="text-right font-medium py-1.5">Count</th>
+                    <th className="text-right font-medium py-1.5">Share</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stageBreakdown.map((s) => (
+                    <tr
+                      key={s.label}
+                      className="border-b border-border/50 last:border-0"
+                    >
+                      <td className="py-1.5">
+                        <span className="inline-flex items-center gap-2">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: s.color }}
+                          />
+                          <span className="text-foreground">{s.label}</span>
+                        </span>
+                      </td>
+                      <td className="text-right tabular-nums text-foreground">
+                        {s.value}
+                      </td>
+                      <td className="text-right tabular-nums text-muted-foreground">
+                        {Math.round((s.value / allVentures.length) * 100)}%
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Ventures snapshot */}
