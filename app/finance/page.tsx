@@ -60,7 +60,7 @@ export default async function FinancePage() {
         <form action={refreshMarkets}>
           <button
             type="submit"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-md border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 text-xs rounded-full border border-border bg-card shadow-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
           >
             <RefreshCw className="w-3 h-3" />
             Refresh
@@ -69,7 +69,7 @@ export default async function FinancePage() {
       </div>
 
       {quotes.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-8 text-center">
+        <div className="rounded-lg border border-border bg-card p-8 text-center shadow-sm">
           <p className="text-muted-foreground text-sm">
             No market data yet. Click Refresh to load prices.
           </p>
@@ -87,20 +87,20 @@ export default async function FinancePage() {
                 <div className="rounded-lg border border-border bg-card overflow-hidden card-hover">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left text-xs text-muted-foreground font-medium px-4 py-2.5">
+                      <tr className="border-b border-border bg-muted/40">
+                        <th className="text-left text-xs text-muted-foreground font-medium px-4 py-3">
                           Name
                         </th>
-                        <th className="text-left text-xs text-muted-foreground font-medium px-4 py-2.5 hidden sm:table-cell">
+                        <th className="text-left text-xs text-muted-foreground font-medium px-4 py-3 hidden sm:table-cell">
                           Symbol
                         </th>
-                        <th className="text-center text-xs text-muted-foreground font-medium px-4 py-2.5 hidden md:table-cell">
+                        <th className="text-center text-xs text-muted-foreground font-medium px-4 py-3 hidden md:table-cell">
                           30d
                         </th>
-                        <th className="text-right text-xs text-muted-foreground font-medium px-4 py-2.5">
+                        <th className="text-right text-xs text-muted-foreground font-medium px-4 py-3">
                           Price
                         </th>
-                        <th className="text-right text-xs text-muted-foreground font-medium px-4 py-2.5">
+                        <th className="text-right text-xs text-muted-foreground font-medium px-4 py-3">
                           Change
                         </th>
                       </tr>
@@ -109,13 +109,15 @@ export default async function FinancePage() {
                       {rows.map((q, i) => (
                         <tr
                           key={q.symbol}
-                          className={i < rows.length - 1 ? "border-b border-border/50" : ""}
+                          className={`transition-colors hover:bg-accent/40 ${
+                            i < rows.length - 1 ? "border-b border-border/50" : ""
+                          }`}
                         >
-                          <td className="px-4 py-2.5 text-foreground">{q.label}</td>
-                          <td className="px-4 py-2.5 text-muted-foreground hidden sm:table-cell">
+                          <td className="px-4 py-3 text-foreground">{q.label}</td>
+                          <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">
                             {q.symbol}
                           </td>
-                          <td className="px-4 py-2.5 hidden md:table-cell">
+                          <td className="px-4 py-3 hidden md:table-cell">
                             <div className="flex justify-center">
                               <Sparkline
                                 data={history[q.symbol] ?? []}
@@ -123,11 +125,11 @@ export default async function FinancePage() {
                               />
                             </div>
                           </td>
-                          <td className="px-4 py-2.5 text-right tabular-nums text-foreground">
+                          <td className="px-4 py-3 text-right tabular-nums text-foreground">
                             {fmt(q.price)}
                           </td>
                           <td
-                            className={`px-4 py-2.5 text-right tabular-nums ${changeColor(q.change_pct)}`}
+                            className={`px-4 py-3 text-right tabular-nums ${changeColor(q.change_pct)}`}
                           >
                             {fmtPct(q.change_pct)}
                           </td>

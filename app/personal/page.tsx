@@ -64,7 +64,7 @@ export default async function PersonalPage() {
           {COLUMNS.map(({ status, label }, i) => {
             const tasks = tasksByStatus[i] ?? [];
             return (
-              <div key={status} className="rounded-lg border border-border bg-card p-3 space-y-2 card-hover">
+              <div key={status} className="rounded-lg border border-border bg-card p-4 space-y-2 card-hover">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     {label}
@@ -109,7 +109,7 @@ export default async function PersonalPage() {
           <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
             Habits — last 14 days
           </h2>
-          <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto">
+          <div className="rounded-lg border border-border bg-card p-4 overflow-x-auto card-hover">
             <table className="w-full text-xs">
               <thead>
                 <tr>
@@ -162,7 +162,7 @@ export default async function PersonalPage() {
         <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
           <CalendarDays className="w-3.5 h-3.5" /> Next 7 days
         </h2>
-        <div className="rounded-lg border border-border bg-card divide-y divide-border">
+        <div className="rounded-lg border border-border bg-card divide-y divide-border card-hover">
           {calEvents.length === 0 ? (
             <p className="text-xs text-muted-foreground p-4">
               No events — sign in with Google to see your calendar.

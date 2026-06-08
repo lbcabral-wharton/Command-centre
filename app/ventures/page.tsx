@@ -46,7 +46,7 @@ export default async function VenturesPage() {
       </div>
 
       {ventures.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-8 text-center">
+        <div className="rounded-lg border border-border bg-card p-8 text-center shadow-sm">
           <p className="text-muted-foreground text-sm">No ventures yet.</p>
         </div>
       ) : (
@@ -57,7 +57,7 @@ export default async function VenturesPage() {
               <div key={stage} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded capitalize ${STAGE_COLORS[stage]}`}
+                    className={`text-xs font-medium px-2.5 py-0.5 rounded-full capitalize ${STAGE_COLORS[stage]}`}
                   >
                     {stage}
                   </span>
@@ -71,7 +71,7 @@ export default async function VenturesPage() {
                   items.map((v) => (
                     <div
                       key={v.id}
-                      className={`rounded-lg border bg-card p-3 space-y-1.5 card-hover ${
+                      className={`rounded-lg border bg-card p-4 space-y-1.5 card-hover ${
                         isStale(v) ? "border-amber-300" : "border-border"
                       }`}
                     >

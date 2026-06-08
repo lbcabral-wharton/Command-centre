@@ -37,9 +37,9 @@
 }
 
 @layer components {
-  /* Subtle interactive lift for cards */
+  /* Soft resting elevation + interactive lift for cards */
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5;
+    @apply shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
   }
 }
 
